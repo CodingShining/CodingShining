@@ -1,0 +1,54 @@
+function startMover(obj,json,fn)
+		{
+			clearInterval(obj.time);
+			obj.time=setInterval(function(){
+				var flag =true;
+				for(var attr in json)
+					{
+						//定义个变量来获取元素的当前值！
+						var attrobj = 0;
+						if(attr=='opacity'){
+							attrobj=Math.round(parseFloat(getStyle(obj,attr))*100);
+						}else{
+							//函数执行：利用getStyle()函数获取对象的属性的原始值
+							attrobj = parseInt(getStyle(obj,attr));
+						}
+						//缓冲运动
+						var seep = (json[attr]-attrobj)/8;
+						seep=seep>0?Math.ceil(seep):Math.floor(seep);
+						//判断动画是否完成：
+						if(attrobj!==json[attr])
+						{
+							flag=false;
+						}
+						if(attr == "opacity")
+						{
+							obj.style.filter="alpha(opacity:"+(attrobj+seep)+")";
+							obj.style.opacity=(attrobj+seep)/100
+						}else
+						{
+							//否则继续执行：
+							obj.style[attr]=attrobj+seep+"px";
+						}
+					}
+					if(flag)
+					{
+						clearInterval(obj.time);
+						if(fn)
+						{
+							fn();
+						}
+					}
+				},15);
+		}
+		function getStyle(o,attr){
+			if(o.currentStyle)
+			{
+				return o.currentStyle[attr];
+			}else
+			{
+				return getComputedStyle(o,false)[attr];
+			}
+		}
+		
+/*使用方法:ElementObj_ON=function (){ starMover(ElementObj,{attrName:value,attrName:value}),function(){starMover(...)}}*/
